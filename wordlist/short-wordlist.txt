@@ -1,0 +1,16 @@
+admin
+login
+dashboard
+api
+assets
+static
+uploads
+robots.txt
+sitemap.xml
+favicon.ico
+index.html
+backup
+old
+config
+.git
+.env

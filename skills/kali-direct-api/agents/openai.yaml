@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kali Direct API"
+  short_description: "Call the Kali server HTTP API directly"
+  default_prompt: "Use $kali-direct-api to run an authorized Kali API command without the MCP bridge."
