@@ -99,7 +99,7 @@ Example MCP cline (clien_mcp_settings.json):
 }
 ```
 
-For opencode client:
+For opencode or Vscode clients:
 
 ```json
 {
