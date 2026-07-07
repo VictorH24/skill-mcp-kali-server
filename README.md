@@ -16,22 +16,34 @@ inspired from https://gitlab.com/kalilinux/packages/mcp-kali-server
 
 ## Quick Start
 
-Build the image:
+### Download the image:
 
 ```sh
-docker build -t mcp-kali-server .
+docker pull ghcr.io/victorh24/skill-mcp-kali-server:latest
 ```
 
-Run it locally:
+### Start the container:
 
 ```sh
-docker run -it --restart unless-stopped -p 127.0.0.1:3333:3333 -d mcp-kali-server 
+docker run -d --restart unless-stopped -p 127.0.0.1:5000:5000 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
+```
+
+### Build the image:
+
+```sh
+docker build -t skill-mcp-kali-server .
+```
+
+Run the MCP server:
+
+```sh
+docker run -it --restart unless-stopped -p 127.0.0.1:3333:3333 -d skill-mcp-kali-server 
 ```
 
 Run the kali api only (no MCP, to use the skills only) 
 
 ```sh
-docker run -it --restart unless-stopped -p 127.0.0.1:5000:5000 -d mcp-kali-server 
+docker run -it --restart unless-stopped -p 127.0.0.1:5000:5000 -d skill-mcp-kali-server 
 ```
 
 or both

@@ -85,6 +85,21 @@ Print raw `curl` examples for every API endpoint:
 ```sh
 python3 skills/kali-direct-api/scripts/kali_api.py curl-examples
 ```
+## if the API is not reachable. You can start the Docker container with the following command:
+
+```sh
+docker start skill-mcp-kali-server
+```
+
+## if the container is not present, you can pull and run it with:
+
+```sh
+docker pull ghcr.io/victorh24/skill-mcp-kali-server:latest
+```
+
+```sh
+docker run -d --restart unless-stopped -p 127.0.0.1:5000:5000 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
+```
 
 ## John the Ripper Result Interpretation
 

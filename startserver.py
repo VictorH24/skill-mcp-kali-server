@@ -122,7 +122,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, shutdown)
     signal.signal(signal.SIGTERM, shutdown)
 
-    start_script("kali_server.py", "kali_server")
+    start_script("kali_server.py --ip ${API_HOST:-0.0.0.0}", "kali_server")
     start_script("mcp_server_remote.py", "mcp_server_remote")
 
     print("Supervisor running. Press Ctrl+C to stop everything.", flush=True)
