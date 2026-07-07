@@ -44,10 +44,10 @@ RUN pip install -r requirements.txt
 
 COPY . /app
 
-EXPOSE 5000
+EXPOSE 55100
 
 # Non-root user
 # RUN useradd -m kaliuser
 # USER kaliuser
 
-CMD ["sh", "-c", "python3 kali_server.py --ip ${API_HOST:-0.0.0.0} --port 5000"]
+CMD ["sh", "-c", "python3 kali_server.py --ip ${API_HOST:-0.0.0.0} --port 55100"]

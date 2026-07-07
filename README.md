@@ -25,7 +25,7 @@ docker pull ghcr.io/victorh24/skill-mcp-kali-server:latest
 ### Start the container:
 
 ```sh
-docker run -d --restart unless-stopped -p 127.0.0.1:5000:5000 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
+docker run -d --restart unless-stopped -p 127.0.0.1:55100:55100 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
 ```
 
 ### Build the image:
@@ -43,16 +43,16 @@ docker run -it --restart unless-stopped -p 127.0.0.1:3333:3333 -d skill-mcp-kali
 Run the kali api only (no MCP, to use the skills only) 
 
 ```sh
-docker run -it --restart unless-stopped -p 127.0.0.1:5000:5000 -d skill-mcp-kali-server 
+docker run -it --restart unless-stopped -p 127.0.0.1:55100:55100 -d skill-mcp-kali-server 
 ```
 
 or both
 
 ```sh
-docker run -it --restart unless-stopped -p 127.0.0.1:5000:5000 -p 127.0.0.1:3333:3333 -d mcp-kali-server 
+docker run -it --restart unless-stopped -p 127.0.0.1:55100:55100 -p 127.0.0.1:3333:3333 -d mcp-kali-server 
 ```
 
-The container publishes the API on `http://localhost:5000` and the MCP bridge on `http://localhost:3333/mcp`.
+The container publishes the API on `http://localhost:55100` and the MCP bridge on `http://localhost:3333/mcp`.
 
 ## Skill
 
@@ -60,7 +60,7 @@ This repository includes a Codex skill for using the Kali API directly when you 
 
 - Skill folder: `skills/kali-direct-api`
 - Skill name: `$kali-direct-api`
-- Direct API target: `http://127.0.0.1:5000`
+- Direct API target: `http://127.0.0.1:55100`
 
 The skill includes a small helper script and raw `curl` examples for every API endpoint.
 
@@ -82,10 +82,10 @@ Run a direct command through the API:
 python3 skills/kali-direct-api/scripts/kali_api.py run "nmap --version" --timeout 30
 ```
 
-If the API is not running on `http://127.0.0.1:5000`, set `KALI_API_URL`:
+If the API is not running on `http://127.0.0.1:55100`, set `KALI_API_URL`:
 
 ```sh
-KALI_API_URL=http://127.0.0.1:5000 python3 skills/kali-direct-api/scripts/kali_api.py health
+KALI_API_URL=http://127.0.0.1:55100 python3 skills/kali-direct-api/scripts/kali_api.py health
 ```
 
 ## MCP Client Configuration

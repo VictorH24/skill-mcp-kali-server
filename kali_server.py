@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 # Variables
-SERVER_PORT = int(os.environ.get("SERVER_PORT", 5000))
+SERVER_PORT = int(os.environ.get("SERVER_PORT", 55100))
 SERVER_HOST = os.environ.get("SERVER_HOST", "127.0.0.1")
 DEBUG_MODE = os.environ.get("DEBUG_MODE", "0").lower() in ("1", "true", "yes", "y", "on")
 COMMAND_TIMEOUT = 900  # 15 minutes max for any command

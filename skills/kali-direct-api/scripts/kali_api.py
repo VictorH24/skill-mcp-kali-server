@@ -9,7 +9,7 @@ import urllib.error
 import urllib.request
 
 
-DEFAULT_BASE_URL = "http://127.0.0.1:5000"
+DEFAULT_BASE_URL = "http://127.0.0.1:55100"
 
 
 def curl_examples() -> str:

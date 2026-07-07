@@ -1,13 +1,13 @@
 ---
 name: kali-direct-api
-description: Direct HTTP access to the local Kali Linux API server on port 5000 without using the MCP bridge. Use when Codex needs to search Kali tools, read tool help, run authorized terminal commands, or manage interactive Kali sessions by calling http://127.0.0.1:5000 directly instead of http://127.0.0.1:3333/mcp.
+description: Direct HTTP access to the local Kali Linux API server on port 55100 without using the MCP bridge. Use when Codex needs to search Kali tools, read tool help, run authorized terminal commands, or manage interactive Kali sessions by calling http://127.0.0.1:55100 directly instead of http://127.0.0.1:3333/mcp.
 ---
 
 # Kali Direct API
 
 ## Overview
 
-Use this skill when the MCP bridge is unavailable, unwanted, or unnecessary and the local Kali Flask API is reachable on port 5000.
+Use this skill when the MCP bridge is unavailable, unwanted, or unnecessary and the local Kali Flask API is reachable on port 55100.
 
 Prefer the bundled client script for repeatable calls:
 
@@ -15,13 +15,13 @@ Prefer the bundled client script for repeatable calls:
 python3 skills/kali-direct-api/scripts/kali_api.py health
 ```
 
-Set `KALI_API_URL` when the API is not at `http://127.0.0.1:5000`.
+Set `KALI_API_URL` when the API is not at `http://127.0.0.1:55100`.
 Run `python3 skills/kali-direct-api/scripts/kali_api.py curl-examples` when raw `curl` commands are preferred.
 
 ## Workflow
 
 1. Confirm the user request is for authorized security testing or local lab work.
-2. Check server availability with `health`.
+2. Check server availability with `health`, if not reachable, start the Docker container with `docker start skill-mcp-kali-server` or pull and run it with the provided commands.
 3. Use `search-tools` or `manual` before running unfamiliar tools.
 4. Use `run` for one-shot commands that should complete.
 5. Use `session-start`, `session-poll`, `session-input`, `session-signal`, and `session-stop` for long-running or interactive tools.
@@ -98,7 +98,7 @@ docker pull ghcr.io/victorh24/skill-mcp-kali-server:latest
 ```
 
 ```sh
-docker run -d --restart unless-stopped -p 127.0.0.1:5000:5000 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
+docker run -d --restart unless-stopped -p 127.0.0.1:55100:55100 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
 ```
 
 ## John the Ripper Result Interpretation
@@ -120,7 +120,7 @@ Always determine success only from john --show output.
 Use these commands when Python should not be used:
 
 ```sh
-KALI_API_URL=http://127.0.0.1:5000
+KALI_API_URL=http://127.0.0.1:55100
 
 curl -s "$KALI_API_URL/health" | jq .
 curl -s "$KALI_API_URL/api/list_categories" | jq .

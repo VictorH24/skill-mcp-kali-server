@@ -14,7 +14,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-API_BASE_URL = os.environ.get("KALI_API_URL", "http://127.0.0.1:5000").rstrip("/")
+API_BASE_URL = os.environ.get("KALI_API_URL", "http://127.0.0.1:55100").rstrip("/")
 MCP_HOST = os.environ.get("MCP_HOST", "127.0.0.1")
 MCP_PORT = int(os.environ.get("MCP_PORT", "3333"))
 MCP_PATH = os.environ.get("MCP_PATH", "/mcp")
