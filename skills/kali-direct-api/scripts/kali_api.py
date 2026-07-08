@@ -7,7 +7,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
-
+import socket
 
 DEFAULT_BASE_URL = "http://127.0.0.1:55100"
 
@@ -72,14 +72,17 @@ def base_url() -> str:
 
 
 def request_json(method: str, path: str, payload=None, timeout: int = 60):
+    url = f"{base_url()}{path}"
+
     data = None
     headers = {"Accept": "application/json"}
+
     if payload is not None:
         data = json.dumps(payload).encode("utf-8")
         headers["Content-Type"] = "application/json"
 
     req = urllib.request.Request(
-        f"{base_url()}{path}",
+        url,
         data=data,
         headers=headers,
         method=method,
@@ -88,21 +91,78 @@ def request_json(method: str, path: str, payload=None, timeout: int = 60):
     try:
         with urllib.request.urlopen(req, timeout=timeout) as response:
             body = response.read().decode("utf-8", errors="replace")
-            return json.loads(body) if body else {}
+
+            if not body.strip():
+                return {}
+
+            try:
+                return json.loads(body)
+            except json.JSONDecodeError:
+                return {
+                    "success": False,
+                    "error": "invalid_json_response",
+                    "detail": body,
+                    "url": url,
+                }
+
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
+
         try:
             detail = json.loads(body) if body else {}
         except json.JSONDecodeError:
             detail = {"body": body}
-        return {"success": False, "status": exc.code, "error": exc.reason, "detail": detail}
-    except (urllib.error.URLError, TimeoutError) as exc:
-        return {"success": False, "error": str(exc), "url": f"{base_url()}{path}"}
+
+        return {
+            "success": False,
+            "error": "http_error",
+            "status": exc.code,
+            "reason": exc.reason,
+            "detail": detail,
+            "url": url,
+        }
+
+    except socket.timeout:
+        return {
+            "success": False,
+            "error": "client_timeout",
+            "message": f"The HTTP client timed out after {timeout} seconds waiting for the Kali API response.",
+            "hint": "The command may still be running server-side. For long scans, use session-start and session-poll instead of the blocking run command.",
+            "url": url,
+        }
+
+    except TimeoutError:
+        return {
+            "success": False,
+            "error": "timeout",
+            "message": f"The request timed out after {timeout} seconds.",
+            "url": url,
+        }
+
+    except urllib.error.URLError as exc:
+        return {
+            "success": False,
+            "error": "connection_error",
+            "message": str(exc.reason),
+            "url": url,
+        }
+
+    except OSError as exc:
+        return {
+            "success": False,
+            "error": "network_error",
+            "message": str(exc),
+            "url": url,
+        }
 
 
 def print_json(value) -> int:
     print(json.dumps(value, indent=2, sort_keys=True))
-    return 0 if value.get("success", True) is not False else 1
+
+    if isinstance(value, dict) and value.get("success", True) is False:
+        return 1
+
+    return 0
 
 
 def main() -> int:
@@ -161,9 +221,27 @@ def main() -> int:
         return print_json(request_json("POST", "/api/search_tools", {"query": args.query}))
     if args.command == "manual":
         return print_json(request_json("POST", "/api/read_tool_manual", {"tool": args.tool}))
+    # if args.command == "run":
+    #     payload = {"command": args.shell_command, "timeout": args.timeout}
+    #     return print_json(request_json("POST", "/api/run_terminal_command", payload, args.timeout + 15))
     if args.command == "run":
         payload = {"command": args.shell_command, "timeout": args.timeout}
-        return print_json(request_json("POST", "/api/run_terminal_command", payload, args.timeout + 10))
+
+        result = request_json(
+            "POST",
+            "/api/run_terminal_command",
+            payload,
+            args.timeout + 15,
+        )
+
+        if isinstance(result, dict) and result.get("error") in {"client_timeout", "timeout"}:
+            result["command_timeout"] = args.timeout
+            result["client_timeout"] = args.timeout + 15
+            result["recommendation"] = (
+                "Use session-start/session-poll for long-running commands like nikto, nmap, gobuster, ffuf, etc."
+            )
+
+        return print_json(result)
     if args.command == "session-start":
         return print_json(request_json("POST", "/api/session/start", {"command": args.shell_command}))
     if args.command == "session-poll":
