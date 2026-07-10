@@ -16,6 +16,8 @@ inspired from https://gitlab.com/kalilinux/packages/mcp-kali-server
 
 ## Quick Start
 
+## To use with the Skill:
+
 ### Download the image:
 
 ```sh
@@ -26,6 +28,17 @@ docker pull ghcr.io/victorh24/skill-mcp-kali-server:latest
 
 ```sh
 docker run -d --restart unless-stopped -p 127.0.0.1:55100:55100 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
+```
+
+## To use the MCP:
+```sh
+docker pull ghcr.io/victorh24/mcp-kali-server:latest
+```
+
+### Start the container:
+
+```sh
+docker run -d --restart unless-stopped -p 127.0.0.1:3333:3333 --name mcp-kali-server ghcr.io/victorh24/mcp-kali-server:latest
 ```
 
 ### Build the image:
