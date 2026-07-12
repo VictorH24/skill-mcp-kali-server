@@ -29,6 +29,24 @@ RUN apt-get update && apt-get install -y \
     exploitdb \
     tcpdump \
     wordlists \
+    libimage-exiftool-perl \
+    steghide \
+    tcpflow \
+    arp-scan \
+    assetfinder \
+    autorecon \
+    certgraph \
+    cloud-enum \
+    cloudbrute \
+    bind9-dnsutils \
+    dmitry \
+    eyewitness \
+    findomain \
+    httprobe \
+    httpx-toolkit \
+    ldeep \
+    massdns \
+    naabu \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

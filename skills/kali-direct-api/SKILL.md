@@ -23,9 +23,22 @@ Run `python3 skills/kali-direct-api/scripts/kali_api.py curl-examples` when raw 
 1. Confirm the user request is for authorized security testing or local lab work.
 2. Check server availability with `health`, if not reachable, start the Docker container with `docker start skill-mcp-kali-server` or pull and run it with the provided commands.
 3. Use `search-tools` or `manual` before running unfamiliar tools.
-4. Use `run` for one-shot commands that should complete.
-5. Use `session-start`, `session-poll`, `session-input`, `session-signal`, and `session-stop` for long-running or interactive tools.
-6. Summarize command intent and important output for the user; avoid dumping huge raw output unless requested.
+4. If a required tool is missing, offer to install its verified package only after receiving explicit user approval and confirming the container permits package installation.
+5. Use `run` for one-shot commands that should complete.
+6. Use `session-start`, `session-poll`, `session-input`, `session-signal`, and `session-stop` for long-running or interactive tools.
+7. Summarize command intent and important output for the user; avoid dumping huge raw output unless requested.
+
+## Optional pentest documentation workspace
+
+Documentation is strictly opt-in. Do not create folders, write notes, save command output, or otherwise persist target information unless the user explicitly asks to document, record, preserve, or report the pentest. Normal Kali API use remains ephemeral apart from behavior already provided by the server.
+
+When the user opts in, read [references/pentest-documentation.md](references/pentest-documentation.md) before testing. Create one dedicated folder per pentest and use the canonical structure in that reference for every engagement. Record the authorized target and scope, planned strategy, activity timeline, evidence, and findings throughout the work rather than reconstructing them at the end.
+
+If the user asks to stop documentation, stop all further workspace writes immediately while leaving existing files intact. Never delete an existing pentest workspace unless the user explicitly requests deletion.
+
+## Tool references
+
+When the correct tool is unclear, open [references/index.md](references/index.md), then read only the relevant category page for selection guidance and important limitations. Do not load every category. After selecting a tool, query its live manual for version-specific syntax. Skip the references when the tool is already known.
 
 ## Commands
 
@@ -59,11 +72,33 @@ Run a one-shot command:
 ```sh
 python3 skills/kali-direct-api/scripts/kali_api.py run "nmap --version" --timeout 30
 ```
-here and exemple of john the ripper command:
+
+For authorized John the Ripper hash-auditing workflows and reliable result interpretation, read [references/john.md](references/john.md).
+
+## Installing a missing tool
+
+Do not install a package automatically. When `search-tools` reports that a required tool is missing:
+
+1. Explain why the tool is needed and ask the user for explicit approval to modify the container.
+2. Confirm package-management permission and identify the correct package. Do not assume the executable and package names are identical.
+3. Accept only a literal Debian package name containing lowercase letters, digits, `+`, `.`, or `-`; never interpolate untrusted text into the shell command.
+4. Install only the approved package, then verify the executable with `search-tools` and `manual`.
+5. Report that an ad-hoc installation lives in the container's writable layer and may disappear when the container is replaced. For a durable installation, propose adding the package to the Dockerfile and rebuilding the image.
+
+Check identity and available package metadata before requesting or performing installation:
 
 ```sh
-python3 "skills/kali-direct-api/scripts/kali_api.py" run "printf '%s\n' 'HASH_HERE' > /tmp/hash.txt; rm -f /tmp/john.pot; john --format=Raw-SHA256 --wordlist=/usr/share/wordlists/rockyou.txt --pot=/tmp/john.pot /tmp/hash.txt; john --format=Raw-SHA256 --pot=/tmp/john.pot --show /tmp/hash.txt" --timeout 300
+python3 skills/kali-direct-api/scripts/kali_api.py run "id; command -v apt-get; apt-cache show -- PACKAGE | sed -n '1,20p'" --timeout 30
 ```
+
+After approval, and only when the API process has sufficient container permissions, install the verified package:
+
+```sh
+python3 skills/kali-direct-api/scripts/kali_api.py run "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -- PACKAGE" --timeout 900
+```
+
+Replace `PACKAGE` with the verified literal package name. Do not add repositories, import signing keys, use installation scripts from the web, or upgrade unrelated packages unless the user separately approves that broader change.
+
 Start and manage an interactive session:
 
 ```sh
@@ -100,20 +135,6 @@ docker pull ghcr.io/victorh24/skill-mcp-kali-server:latest
 ```sh
 docker run -d --restart unless-stopped -p 127.0.0.1:55100:55100 --name skill-mcp-kali-server ghcr.io/victorh24/skill-mcp-kali-server:latest
 ```
-
-## John the Ripper Result Interpretation
-
-When using `john`, do **not** infer cracked passwords from progress/status lines in `stderr`.
-
-John may print candidate words being tested, for example:
-
-```text
-0g 0:00:00:00 DONE ... """anokax"..
-```
-This does not mean anokax was cracked. It is only a candidate/progress display.
-
-Always determine success only from john --show output.
-
 
 ## Curl Commands
 
@@ -179,64 +200,21 @@ The script wraps these endpoints:
 - `POST /api/session/stop` with `{"session_id": "..."}`
 - `GET /api/session/list`
 
-## Kali Categories
+## Kali tool categories
 
-Use these known `KALI_CATEGORIES` keys with `search-tools` or `/api/search_tools`:
+Retrieve the categories currently exposed by the running server:
 
-```python
-KALI_CATEGORIES = {
-    "information-gathering": [
-        "nmap", "masscan", "dmitry", "dnsenum", "dnsrecon", "fierce", "maltego",
-        "netdiscover", "recon-ng", "spiderfoot", "theharvester", "wafw00f", "whatweb",
-        "whois", "amass", "sublist3r", "enum4linux", "nbtscan", "onesixtyone",
-        "smbclient", "smbmap", "snmpwalk", "snmp-check"
-    ],
-    "vulnerability-analysis": [
-        "nikto", "nmap", "openvas", "legion", "lynis", "unix-privesc-check",
-        "sqlmap", "wpscan", "nuclei", "searchsploit", "vulscan"
-    ],
-    "web-application": [
-        "burpsuite", "dirb", "dirbuster", "gobuster", "feroxbuster", "ffuf", "nikto",
-        "sqlmap", "wpscan", "wfuzz", "whatweb", "zaproxy", "httpx", "hakrawler",
-        "arjun", "commix", "xsser", "dalfox"
-    ],
-    "password-attacks": [
-        "hydra", "john", "hashcat", "medusa", "ncrack", "ophcrack", "wordlists",
-        "crunch", "cewl", "cupp", "hash-identifier", "hashid", "patator", "thc-pptp-bruter"
-    ],
-    "wireless-attacks": [
-        "aircrack-ng", "airmon-ng", "airodump-ng", "aireplay-ng", "cowpatty", "fern-wifi-cracker",
-        "kismet", "pixiewps", "reaver", "wifite", "bully", "hostapd-wpe"
-    ],
-    "exploitation": [
-        "metasploit", "msfconsole", "msfvenom", "armitage", "beef-xss", "exploitdb",
-        "searchsploit", "shellnoob", "social-engineering-toolkit", "setoolkit"
-    ],
-    "sniffing-spoofing": [
-        "wireshark", "tshark", "tcpdump", "ettercap", "bettercap", "arpspoof",
-        "dnsspoof", "macchanger", "mitmproxy", "responder", "sslstrip", "netsniff-ng"
-    ],
-    "post-exploitation": [
-        "mimikatz", "powersploit", "empire", "bloodhound", "crackmapexec", "evil-winrm",
-        "impacket", "pth-toolkit", "smbexec", "wmiexec", "psexec", "proxychains",
-        "chisel", "ligolo", "pwncat"
-    ],
-    "forensics": [
-        "autopsy", "binwalk", "bulk-extractor", "foremost", "galleta", "hashdeep",
-        "volatility", "sleuthkit", "dc3dd", "extundelete", "scalpel", "pdf-parser"
-    ],
-    "reporting": [
-        "cutycapt", "faraday", "maltego", "metagoofil", "pipal", "recordmydesktop"
-    ],
-    "reverse-engineering": [
-        "ghidra", "radare2", "gdb", "edb-debugger", "ollydbg", "apktool",
-        "dex2jar", "jd-gui", "jadx", "rizin", "cutter", "objdump", "strings"
-    ],
-    "hardware-hacking": [
-        "arduino", "dfu-util", "flashrom", "openocd"
-    ]
-}
+```sh
+python3 skills/kali-direct-api/scripts/kali_api.py categories
 ```
+
+Inspect the installed tools in a category:
+
+```sh
+python3 skills/kali-direct-api/scripts/kali_api.py search-tools information-gathering
+```
+
+When tool selection is unclear, read [references/index.md](references/index.md) and load only the relevant category page. Treat the running server as authoritative because its configured tools may change independently of this skill.
 
 ## Safety Notes
 

@@ -42,8 +42,9 @@ KALI_CATEGORIES = {
     "information-gathering": [
         "nmap", "masscan", "dmitry", "dnsenum", "dnsrecon", "fierce", "maltego",
         "netdiscover", "recon-ng", "spiderfoot", "theharvester", "wafw00f", "whatweb",
-        "whois", "amass", "sublist3r", "enum4linux", "nbtscan", "onesixtyone",
-        "smbclient", "smbmap", "snmpwalk", "snmp-check"
+        "whois", "amass", "sublist3r", "enum4linux", "nbtscan", "onesixtyone", "massdns",
+        "smbclient", "smbmap", "snmpwalk", "snmp-check", "arp-scan", "assetfinder", "autorecon", "naabu",
+        "certgraph", "cloud-enum", "cloudbrute", "dmitry", "eyewitness", "findomain", "httprobe", "httpx-toolkit", "ldeep"
     ],
     "vulnerability-analysis": [
         "nikto", "nmap", "openvas", "legion", "lynis", "unix-privesc-check",
@@ -68,7 +69,7 @@ KALI_CATEGORIES = {
     ],
     "sniffing-spoofing": [
         "wireshark", "tshark", "tcpdump", "ettercap", "bettercap", "arpspoof",
-        "dnsspoof", "macchanger", "mitmproxy", "responder", "sslstrip", "netsniff-ng"
+        "dnsspoof", "macchanger", "mitmproxy", "responder", "sslstrip", "netsniff-ng", "tcpflow"
     ],
     "post-exploitation": [
         "mimikatz", "powersploit", "empire", "bloodhound", "crackmapexec", "evil-winrm",
@@ -76,8 +77,8 @@ KALI_CATEGORIES = {
         "chisel", "ligolo", "pwncat"
     ],
     "forensics": [
-        "autopsy", "binwalk", "bulk-extractor", "foremost", "galleta", "hashdeep",
-        "volatility", "sleuthkit", "dc3dd", "extundelete", "scalpel", "pdf-parser"
+        "autopsy", "binwalk", "bulk-extractor", "foremost", "galleta", "hashdeep", "steghide",
+        "volatility", "sleuthkit", "dc3dd", "extundelete", "scalpel", "pdf-parser","exiftool"
     ],
     "reporting": [
         "cutycapt", "faraday", "maltego", "metagoofil", "pipal", "recordmydesktop"
